@@ -42,14 +42,13 @@ function App() {
   if (selectedHymn) {
     return (
       <main className="app-shell lyric-page">
-        <button className="back-button" onClick={() => setSelectedHymn(null)}>← Volver al catálogo</button>
-        <p className="eyebrow">HIMNARIO PUERTA DEL CIELO</p>
         <h1>{selectedHymn.title}</h1>
         <article className="lyrics">
           {selectedHymn.lyrics || selectedHymn.source
             ? selectedHymn.lyrics || new DOMParser().parseFromString(selectedHymn.source, 'text/html').querySelector('.letra')?.textContent.trim() || 'Esta letra todavía no tiene contenido.'
             : 'Esta letra todavía no tiene contenido.'}
         </article>
+        <button className="back-button" onClick={() => setSelectedHymn(null)}>← Volver al índice</button>
       </main>
     );
   }
