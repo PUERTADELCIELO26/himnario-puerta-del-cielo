@@ -126,10 +126,13 @@ function AdminPanel({ onClose }) {
   const [step, setStep] = useState('');
   const [message, setMessage] = useState('');
   const [steps, setSteps] = useState([]);
+  const [hymns, setHymns] = useState([]);
+  const [showDeleteHymns, setShowDeleteHymns] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
     const today = new Date().toISOString().slice(0, 10);
+    supabase.from('hymns').select('*').order('title').then(({ data }) => setHymns(data || []));
     supabase.from('service_program').select('*').eq('service_date', today).order('step_number').then(({ data }) => setSteps(data || []));
   }, []);
 
@@ -145,9 +148,12 @@ function AdminPanel({ onClose }) {
     event.preventDefault();
     const { data: lastHymn } = await supabase.from('hymns').select('number').order('number', { ascending: false }).limit(1).maybeSingle();
     const nextNumber = (lastHymn?.number || 0) + 1;
-    const { error } = await supabase.from('hymns').insert({ ...hymn, number: nextNumber });
+    const { data, error } = await supabase.from('hymns').insert({ ...hymn, number: nextNumber }).select().single();
     setMessage(error?.message || 'Himno guardado correctamente.');
-    if (!error) setHymn({ title: '', lyrics: '', category: 'adoracion' });
+    if (!error) {
+      setHymn({ title: '', lyrics: '', category: 'adoracion' });
+      setHymns([...hymns, data].sort((first, second) => first.title.localeCompare(second.title, 'es')));
+    }
   };
   const saveStep = async (event) => {
     event.preventDefault();
@@ -163,7 +169,13 @@ function AdminPanel({ onClose }) {
     if (!error) setSteps(steps.filter((current) => current.id !== item.id));
     setMessage(error?.message || 'Paso borrado.');
   };
+  const deleteHymn = async (hymnToDelete) => {
+    if (!window.confirm(`¿Borrar "${hymnToDelete.title}"?`)) return;
+    const { error } = await supabase.from('hymns').delete().eq('id', hymnToDelete.id);
+    if (!error) setHymns(hymns.filter((current) => current.id !== hymnToDelete.id));
+    setMessage(error?.message || 'Alabanza borrada.');
+  };
 
   if (!session) return <main className="admin-page"><button className="back-button" onClick={onClose}>← Volver</button><h1>Panel administrativo</h1><form className="admin-form" onSubmit={signIn}><input type="email" placeholder="Correo administrador" value={login.email} onChange={(event) => setLogin({ ...login, email: event.target.value })} required /><input type="password" placeholder="Contraseña" value={login.password} onChange={(event) => setLogin({ ...login, password: event.target.value })} required /><button>Ingresar</button></form><p>{message}</p></main>;
-  return <main className="admin-page"><button className="back-button" onClick={onClose}>← Ver página</button><h1>Panel administrativo</h1><div className="admin-tabs"><button onClick={() => supabase.auth.signOut()}>Cerrar sesión</button></div><h2>Nuevo himno</h2><form className="admin-form" onSubmit={saveHymn}><input placeholder="Título" value={hymn.title} onChange={(event) => setHymn({ ...hymn, title: event.target.value })} required /><select value={hymn.category} onChange={(event) => setHymn({ ...hymn, category: event.target.value })}><option value="adoracion">Adoración</option><option value="avivamiento">Avivamiento</option></select><textarea placeholder="Letra" rows="12" value={hymn.lyrics} onChange={(event) => setHymn({ ...hymn, lyrics: event.target.value })} /><button>Guardar himno</button></form><h2>Programa de hoy</h2><form className="admin-form" onSubmit={saveStep}><input placeholder="Ej. Cantar alabanzas de avivamiento" value={step} onChange={(event) => setStep(event.target.value)} required /><button>Agregar paso</button></form><div className="service-list">{steps.map((item) => <div className="service-row" key={item.id}><span>{String(item.step_number).padStart(2, '0')}</span><strong>{item.description}</strong><button className="delete-button" type="button" onClick={() => deleteStep(item)}>Borrar</button></div>)}</div><p>{message}</p></main>;
+  return <main className="admin-page"><button className="back-button" onClick={onClose}>← Ver página</button><h1>Panel administrativo</h1><div className="admin-tabs"><button onClick={() => setShowDeleteHymns(!showDeleteHymns)}>{showDeleteHymns ? 'Ocultar alabanzas' : 'Borrar alabanza'}</button><button onClick={() => supabase.auth.signOut()}>Cerrar sesión</button></div><h2>Nueva alabanza</h2><form className="admin-form" onSubmit={saveHymn}><input placeholder="Título" value={hymn.title} onChange={(event) => setHymn({ ...hymn, title: event.target.value })} required /><select value={hymn.category} onChange={(event) => setHymn({ ...hymn, category: event.target.value })}><option value="adoracion">Adoración</option><option value="avivamiento">Avivamiento</option></select><textarea placeholder="Letra" rows="12" value={hymn.lyrics} onChange={(event) => setHymn({ ...hymn, lyrics: event.target.value })} /><button>Guardar alabanza</button></form>{showDeleteHymns && <><h2>Borrar alabanza</h2><div className="service-list">{hymns.length ? hymns.map((item) => <div className="service-row" key={item.id}><span>{item.number}</span><strong>{item.title}</strong><button className="delete-button" type="button" onClick={() => deleteHymn(item)}>Borrar</button></div>) : <div className="empty-state">No hay alabanzas guardadas.</div>}</div></>}<h2>Programa de hoy</h2><form className="admin-form" onSubmit={saveStep}><input placeholder="Ej. Cantar alabanzas de avivamiento" value={step} onChange={(event) => setStep(event.target.value)} required /><button>Agregar paso</button></form><div className="service-list">{steps.map((item) => <div className="service-row" key={item.id}><span>{String(item.step_number).padStart(2, '0')}</span><strong>{item.description}</strong><button className="delete-button" type="button" onClick={() => deleteStep(item)}>Borrar</button></div>)}</div><p>{message}</p></main>;
 }
