@@ -19,8 +19,10 @@ function App() {
       supabase.from('service_program').select('*').eq('service_date', today).order('step_number').then(({ data }) => setCloudService(data || []));
     }
   }, [showAdmin]);
-  const availableHymns = cloudHymns.length ? cloudHymns : allHymns;
-  const visibleHymns = (category ? availableHymns.filter((hymn) => hymn.category === categoryId) : availableHymns)
+  const availableHymns = cloudHymns.length
+    ? cloudHymns.filter((hymn) => hymn.category === categoryId)
+    : category?.hymns || allHymns;
+  const visibleHymns = (category ? availableHymns : allHymns)
     .filter((hymn) => hymn.title.toLowerCase().includes(query.toLowerCase()));
   const serviceItems = cloudService.length ? cloudService : category?.hymns || [];
   const orderedItems = isServiceProgram
@@ -78,7 +80,7 @@ function App() {
                 <span className="category-number">0{categories.indexOf(item) + 1}</span>
                 <strong>{item.name}</strong>
                 <span>{item.description}</span>
-                <small>{item.id === 'servicio' ? `${cloudService.length || item.hymns.length} pasos programados` : `${item.hymns.length} himnos disponibles`} →</small>
+                <small>{item.id === 'servicio' ? `${cloudService.length || item.hymns.length} pasos programados` : `${cloudHymns.length ? cloudHymns.filter((hymn) => hymn.category === item.id).length : item.hymns.length} himnos disponibles`} →</small>
               </button>
             ))}
           </div>
