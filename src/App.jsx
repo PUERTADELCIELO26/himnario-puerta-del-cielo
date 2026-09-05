@@ -58,9 +58,6 @@ function App() {
       <header className="hero">
         <button className="brand" onClick={goHome}>PUERTA DEL CIELO</button>
         <button className="admin-link" onClick={() => setShowAdmin(true)}>Panel administrativo</button>
-        <p className="eyebrow">HIMNARIO DIGITAL</p>
-        <h1>Una voz, muchos cantos</h1>
-        <p className="hero-copy">Encuentra rápidamente la alabanza que necesitas para este momento.</p>
       </header>
 
       <section className="catalog">
