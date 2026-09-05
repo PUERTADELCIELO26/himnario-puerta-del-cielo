@@ -19,7 +19,7 @@ function App() {
       supabase.from('service_program').select('*').eq('service_date', today).order('step_number').then(({ data }) => setCloudService(data || []));
     }
   }, [showAdmin]);
-  const availableHymns = cloudHymns.length
+  const availableHymns = supabase
     ? cloudHymns.filter((hymn) => hymn.category === categoryId)
     : category?.hymns || allHymns;
   const visibleHymns = (category ? availableHymns : allHymns)
