@@ -47,7 +47,7 @@ h2 { margin: 0; font-size: clamp(29px, 5vw, 48px); }
 .admin-tabs { display: flex; gap: 10px; margin-bottom: 30px; }
 .delete-button { justify-self: end; background: #805044; font-size: 12px; }
 .lyric-page { max-width: 820px; margin: 0 auto; padding: 28px 24px 80px; }
-.back-button { color: #815c43; font-weight: 700; }
+.back-button { display: block; margin: 28px 0 0; color: #815c43; font-weight: 700; }
 .lyric-page h1 { margin-top: 70px; color: #4b3327; font-size: clamp(34px, 6vw, 62px); }
-.lyrics { margin-top: 32px; padding: clamp(24px, 5vw, 48px); background: #fbf7ef; white-space: pre-line; color: #5b5048; font-family: Georgia, serif; font-size: 18px; line-height: 1.9; box-shadow: 0 12px 35px rgba(75, 51, 39, .1); }
+.lyrics { margin-top: 32px; padding: clamp(24px, 5vw, 48px); background: #fbf7ef; white-space: pre-line; color: #5b5048; font-family: Georgia, serif; font-size: 16px; line-height: 1.85; box-shadow: 0 12px 35px rgba(75, 51, 39, .1); }
 @media (max-width: 680px) { .category-grid { grid-template-columns: 1fr; } .section-heading { align-items: start; flex-direction: column; } .hero { padding-top: 25px; } }
