@@ -1,17 +1,36 @@
-import alabanza1Raw from '../alabanza1.html?raw';
-import alabanza61Raw from '../alabanza61.html?raw';
-import alabanza62Raw from '../alabanza62.html?raw';
-import alabanza63Raw from '../alabanza63.html?raw';
-import alabanza64Raw from '../alabanza64.html?raw';
-import alabanza65Raw from '../alabanza65.html?raw';
-import alabanza66Raw from '../alabanza66.html?raw';
-import alabanza67Raw from '../alabanza67.html?raw';
-
 export const categories = [
   {
     id: 'adoracion',
     name: 'Adoración',
     description: 'Cantos para entrar en la presencia de Dios',
+    hymns: []
+  },
+  {
+    id: 'avivamiento',
+    name: 'Avivamiento',
+    description: 'Cantos para celebrar con gozo',
+    hymns: [
+      { id: 'avivamiento1', title: 'MIRA CUAN BUENO', source: '' },
+      { id: 'avivamiento2', title: 'GLORIA Y PODER', source: '' },
+      { id: 'avivamiento3', title: 'BUENO ES ALABARTE OH DIOS', source: '' },
+      { id: 'avivamiento4', title: 'TODOS UNIDOS A UNA VOZ', source: '' },
+      { id: 'avivamiento5', title: 'HAY PODER EN JESÚS', source: '' }
+    ]
+  },
+  {
+    id: 'servicio',
+    name: 'Programa de servicio',
+    description: 'Participaciones y orden del servicio',
+    hymns: [
+      { id: 'servicio1', title: 'Cantar alabanzas de avivamiento' },
+      { id: 'servicio2', title: 'Pasar al hermano encargado a dar testimonio' },
+      { id: 'servicio3', title: 'Continuar con el programa de servicio' }
+    ]
+  }
+];
+
+/* El catálogo de Adoración se administra desde Supabase. */
+/*
     hymns: [
       { id: 'alabanza1', title: 'AL CORDERO DAD (ALELUYA)', source: alabanza1Raw },
       { id: 'alabanza2', title: 'ALELUYA (GLORIA ALELUYA)' },
@@ -129,30 +148,7 @@ export const categories = [
       { id: 'alabanza114', title: 'ERES TU EL CREADOR (VENIMOS)' },
       { id: 'alabanza115', title: 'YO POR MEDIO DE TI' }
     ]
-  },
-  {
-    id: 'avivamiento',
-    name: 'Avivamiento',
-    description: 'Cantos para celebrar con gozo',
-    hymns: [
-      { id: 'avivamiento1', title: 'MIRA CUAN BUENO', source: '' },
-      { id: 'avivamiento2', title: 'GLORIA Y PODER', source: '' },
-      { id: 'avivamiento3', title: 'BUENO ES ALABARTE OH DIOS', source: alabanza1Raw },
-      { id: 'avivamiento4', title: 'TODOS UNIDOS A UNA VOZ', source: '' },
-      { id: 'avivamiento5', title: 'HAY PODER EN JESÚS', source: '' }
-    ]
-  },
-  {
-    id: 'servicio',
-    name: 'Programa de servicio',
-    description: 'Participaciones y orden del servicio',
-    hymns: [
-      { id: 'servicio1', title: 'Cantar alabanzas de avivamiento' },
-      { id: 'servicio2', title: 'Pasar al hermano encargado a dar testimonio' },
-      { id: 'servicio3', title: 'Continuar con el programa de servicio' }
-    ]
-  }
-];
+*/
 
 export const allHymns = categories.flatMap((category) =>
   category.hymns.map((hymn) => ({ ...hymn, category: category.name }))
