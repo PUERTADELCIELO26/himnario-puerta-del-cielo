@@ -118,6 +118,7 @@ export default App;
 function AdminPanel({ onClose }) {
   const [session, setSession] = useState(null);
   const [login, setLogin] = useState({ email: '', password: '' });
+  const [loginMessage, setLoginMessage] = useState('');
   const [hymn, setHymn] = useState({ title: '', lyrics: '', category: 'adoracion' });
   const [step, setStep] = useState('');
   const [hymnMessage, setHymnMessage] = useState('');
@@ -139,7 +140,7 @@ function AdminPanel({ onClose }) {
     event.preventDefault();
     const { data, error } = await supabase.auth.signInWithPassword(login);
     setSession(data.session);
-    setMessage(error?.message || 'Sesión iniciada.');
+    setLoginMessage(error?.message || 'Sesión iniciada.');
   };
   const saveHymn = async (event) => {
     event.preventDefault();
@@ -179,6 +180,6 @@ function AdminPanel({ onClose }) {
     setHymnMessage(error?.message || 'Alabanza borrada.');
   };
 
-  if (!session) return <main className="admin-page"><button className="back-button" onClick={onClose}>← Volver</button><h1>Panel administrativo</h1><form className="admin-form" onSubmit={signIn}><input type="email" placeholder="Correo administrador" value={login.email} onChange={(event) => setLogin({ ...login, email: event.target.value })} required /><input type="password" placeholder="Contraseña" value={login.password} onChange={(event) => setLogin({ ...login, password: event.target.value })} required /><button>Ingresar</button></form><p>{message}</p></main>;
+  if (!session) return <main className="admin-page"><button className="back-button" onClick={onClose}>← Volver</button><h1>Panel administrativo</h1><form className="admin-form" onSubmit={signIn}><input type="email" placeholder="Correo administrador" value={login.email} onChange={(event) => setLogin({ ...login, email: event.target.value })} required /><input type="password" placeholder="Contraseña" value={login.password} onChange={(event) => setLogin({ ...login, password: event.target.value })} required /><button>Ingresar</button>{loginMessage && <span className="form-message error">{loginMessage}</span>}</form></main>;
   return <main className="admin-page"><button className="back-button" onClick={onClose}>← Ver página</button><h1>Panel administrativo</h1><div className="admin-tabs"><button onClick={() => setShowDeleteHymns(!showDeleteHymns)}>{showDeleteHymns ? 'Ocultar alabanzas' : 'Borrar alabanza'}</button><button onClick={() => supabase.auth.signOut()}>Cerrar sesión</button></div><h2>Nueva alabanza</h2><form className="admin-form" onSubmit={saveHymn}><input placeholder="Título" value={hymn.title} onChange={(event) => setHymn({ ...hymn, title: event.target.value })} required /><select value={hymn.category} onChange={(event) => setHymn({ ...hymn, category: event.target.value })}><option value="adoracion">Adoración</option><option value="avivamiento">Avivamiento</option></select><textarea placeholder="Letra" rows="12" value={hymn.lyrics} onChange={(event) => setHymn({ ...hymn, lyrics: event.target.value })} /><div className="form-action"><button>Guardar alabanza</button>{hymnMessage && <span className={hymnMessage.includes('repetida') ? 'form-message error' : 'form-message'}>{hymnMessage}</span>}</div></form>{showDeleteHymns && <><h2>Borrar alabanza</h2><div className="service-list">{hymns.length ? hymns.map((item) => <div className="service-row" key={item.id}><span>{item.number}</span><strong>{item.title}</strong><button className="delete-button" type="button" onClick={() => deleteHymn(item)}>Borrar</button></div>) : <div className="empty-state">No hay alabanzas guardadas.</div>}</div></>}<h2>Programa de hoy</h2><form className="admin-form" onSubmit={saveStep}><input placeholder="Ej. Cantar alabanzas de avivamiento" value={step} onChange={(event) => setStep(event.target.value)} required /><div className="form-action"><button>Agregar paso</button>{programMessage && <span className="form-message">{programMessage}</span>}</div></form><div className="service-list">{steps.map((item) => <div className="service-row" key={item.id}><span>{String(item.step_number).padStart(2, '0')}</span><strong>{item.description}</strong><button className="delete-button" type="button" onClick={() => deleteStep(item)}>Borrar</button></div>)}</div></main>;
 }
