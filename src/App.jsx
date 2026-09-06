@@ -142,10 +142,16 @@ function AdminPanel({ onClose }) {
   };
   const saveHymn = async (event) => {
     event.preventDefault();
+    const normalizedTitle = hymn.title.trim().toLocaleLowerCase('es');
+    const isDuplicate = hymns.some((savedHymn) => savedHymn.title.trim().toLocaleLowerCase('es') === normalizedTitle);
+    if (isDuplicate) {
+      setMessage('Error: alabanza repetida. Usa otro nombre.');
+      return;
+    }
     const { data: lastHymn } = await supabase.from('hymns').select('number').order('number', { ascending: false }).limit(1).maybeSingle();
     const nextNumber = (lastHymn?.number || 0) + 1;
-    const { data, error } = await supabase.from('hymns').insert({ ...hymn, number: nextNumber }).select().single();
-    setMessage(error?.message || 'Himno guardado correctamente.');
+    const { data, error } = await supabase.from('hymns').insert({ ...hymn, title: hymn.title.trim(), number: nextNumber }).select().single();
+    setMessage(error?.code === '23505' ? 'Error: alabanza repetida. Usa otro nombre.' : error?.message || 'Himno guardado correctamente.');
     if (!error) {
       setHymn({ title: '', lyrics: '', category: 'adoracion' });
       setHymns([...hymns, data].sort((first, second) => first.title.localeCompare(second.title, 'es')));
