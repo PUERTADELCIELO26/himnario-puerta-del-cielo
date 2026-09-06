@@ -36,3 +36,4 @@ end $$;
 
 create index if not exists hymns_category_number_idx on public.hymns(category, number);
 create index if not exists service_program_date_step_idx on public.service_program(service_date, step_number);
+create unique index if not exists hymns_title_unique_idx on public.hymns(lower(trim(title)));
