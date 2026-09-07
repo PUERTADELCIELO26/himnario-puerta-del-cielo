@@ -9,7 +9,8 @@ VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
 VITE_SUPABASE_ANON_KEY=tu-clave-anon-publica
 ```
 
-4. En Supabase > Authentication > Users crea el usuario administrador.
-5. Ejecuta `npm run dev` y abre `http://localhost:5173/#admin`.
+4. En Supabase > Authentication > Users crea un usuario separado para la persona encargada de editar el himnario. Ese usuario tendrá acceso al botón `Panel administrativo`, donde puede crear, editar y borrar alabanzas.
+5. Si el proyecto ya tenía tablas creadas, vuelve a ejecutar `supabase-schema.sql` para habilitar la categoría `ninos` (Alabanzas de niños).
+6. Ejecuta `npm run dev` y abre `http://localhost:5173/`.
 
 Nunca uses la clave `service_role` en React ni la publiques en GitHub.
