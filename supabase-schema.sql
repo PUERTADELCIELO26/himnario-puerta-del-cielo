@@ -3,7 +3,7 @@ create table if not exists public.hymns (
   number integer not null,
   title text not null,
   lyrics text not null default '',
-  category text not null check (category in ('adoracion', 'avivamiento')),
+  category text not null check (category in ('adoracion', 'avivamiento', 'ninos')),
   created_at timestamptz not null default now()
 );
 
@@ -18,6 +18,9 @@ create table if not exists public.service_program (
 alter table public.hymns enable row level security;
 alter table public.service_program enable row level security;
 
+alter table public.hymns drop constraint if exists hymns_category_check;
+alter table public.hymns add constraint hymns_category_check check (category in ('adoracion', 'avivamiento', 'ninos'));
+
 do $$
 begin
   if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'hymns' and policyname = 'Public can read hymns') then
@@ -26,12 +29,14 @@ begin
   if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'service_program' and policyname = 'Public can read service program') then
     create policy "Public can read service program" on public.service_program for select using (true);
   end if;
-  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'hymns' and policyname = 'Authenticated users manage hymns') then
-    create policy "Authenticated users manage hymns" on public.hymns for all to authenticated using (true) with check (true);
-  end if;
-  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'service_program' and policyname = 'Authenticated users manage service program') then
-    create policy "Authenticated users manage service program" on public.service_program for all to authenticated using (true) with check (true);
-  end if;
+  drop policy if exists "Authenticated users manage hymns" on public.hymns;
+  drop policy if exists "Administrators manage hymns" on public.hymns;
+  drop policy if exists "Editor updates hymns" on public.hymns;
+  create policy "Administrators manage hymns" on public.hymns for all to authenticated using ((auth.jwt() ->> 'email') <> 'aylint1307@gmail.com') with check ((auth.jwt() ->> 'email') <> 'aylint1307@gmail.com');
+  create policy "Editor updates hymns" on public.hymns for update to authenticated using ((auth.jwt() ->> 'email') = 'aylint1307@gmail.com') with check ((auth.jwt() ->> 'email') = 'aylint1307@gmail.com');
+  drop policy if exists "Authenticated users manage service program" on public.service_program;
+  drop policy if exists "Administrators manage service program" on public.service_program;
+  create policy "Administrators manage service program" on public.service_program for all to authenticated using ((auth.jwt() ->> 'email') <> 'aylint1307@gmail.com') with check ((auth.jwt() ->> 'email') <> 'aylint1307@gmail.com');
 end $$;
 
 create index if not exists hymns_category_number_idx on public.hymns(category, number);
