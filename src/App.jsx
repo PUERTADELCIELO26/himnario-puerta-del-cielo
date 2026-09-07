@@ -24,8 +24,8 @@ function App() {
 
   const availableHymns = supabase ? cloudHymns.filter((hymn) => hymn.category === categoryId) : category?.hymns.map((hymn) => ({ ...hymn, category: categoryId })) || allHymns;
   const visibleHymns = (category ? availableHymns : allHymns).filter((hymn) => (hymn.title || '').toLowerCase().includes(query.toLowerCase()));
-  const serviceItems = cloudService.length ? cloudService : category?.hymns || [];
-  const orderedItems = isServiceProgram ? serviceItems.filter((item) => item.description.toLowerCase().includes(query.toLowerCase())) : [...visibleHymns].sort((a, b) => a.title.localeCompare(b.title, 'es'));
+  const serviceItems = (cloudService.length ? cloudService : category?.hymns || []).map((item, index) => ({ ...item, description: item.description || item.title || '', step_number: item.step_number || index + 1 }));
+  const orderedItems = isServiceProgram ? serviceItems.filter((item) => (item.description || item.title || '').toLowerCase().includes(query.toLowerCase())) : [...visibleHymns].sort((a, b) => a.title.localeCompare(b.title, 'es'));
   const goHome = () => { setCategoryId(null); setSelectedHymn(null); setQuery(''); };
 
   if (showAdmin) return <AdminPanel onClose={() => setShowAdmin(false)} />;
@@ -58,7 +58,7 @@ function AdminPanel({ onClose }) {
     const today = new Date().toISOString().slice(0, 10);
     supabase.auth.getSession().then(({ data }) => { setSession(data.session); setShowCatalog(data.session?.user?.email?.toLowerCase() === EDITOR_EMAIL); });
     supabase.from('hymns').select('*').order('title').then(({ data }) => setHymns(data || []));
-    supabase.from('service_program').select('*').eq('service_date', today).order('step_number').then(({ data }) => setSteps(data || []));
+    supabase.from('service_program').select('*').eq('service_date', today).order('step_number').then(({ data }) => setSteps(data?.length ? data : (categories.find((item) => item.id === 'servicio')?.hymns || []).map((item, index) => ({ ...item, description: item.description || item.title, step_number: index + 1 }))));
   }, []);
 
   if (!supabase) return <main className="admin-page"><button className="back-button" onClick={onClose}>← Volver</button><h1>Panel administrativo</h1><p>Agrega las credenciales de Supabase en `.env.local` para activarlo.</p></main>;
