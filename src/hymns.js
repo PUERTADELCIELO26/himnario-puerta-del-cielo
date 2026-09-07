@@ -18,6 +18,12 @@ export const categories = [
     ]
   },
   {
+    id: 'ninos',
+    name: 'Alabanzas de niños',
+    description: 'Cantos para aprender y celebrar en familia',
+    hymns: []
+  },
+  {
     id: 'servicio',
     name: 'Programa de servicio',
     description: 'Participaciones y orden del servicio',
