@@ -47,6 +47,7 @@ h2 { margin: 0; font-size: clamp(29px, 5vw, 48px); }
 .admin-page h2 { margin-top: 44px; color: #5e5348; font-size: 30px; }
 .admin-form { display: grid; gap: 12px; max-width: 680px; }
 .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 14px; border: 1px solid #cbc5bb; background: #f8f4eb; color: #5e5348; }
+.field-label { color: #766b60; font-size: 13px; font-weight: 700; }
 .admin-form button, .admin-tabs button, .delete-button { width: fit-content; padding: 12px 18px; border: 0; background: #6b6259; color: #f8f4eb; }
 .form-action { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; }
 .form-message { color: #6b6259; font-size: 14px; }
