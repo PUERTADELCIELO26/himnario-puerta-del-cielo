@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { allHymns, categories } from './hymns.js';
 import { supabase } from './supabase.js';
 
-const EDITOR_EMAIL = 'aylint1307@gmail.com';
+const EDITOR_EMAILS = ['aylint1307@gmail.com', 'irisc02@gmail.com'].map((email) => email.toLowerCase());
 const emptyHymn = { title: '', lyrics: '', category: 'adoracion' };
 const HIDDEN_SERVICE_STEPS_KEY = 'himnario-hidden-service-steps';
 const SERVICE_STEP_OVERRIDES_KEY = 'himnario-service-step-overrides';
@@ -74,18 +74,29 @@ function AdminPanel({ onClose }) {
   const [editingStep, setEditingStep] = useState(null);
   const [steps, setSteps] = useState([]);
   const [programMessage, setProgramMessage] = useState('');
-  const isEditor = session?.user?.email?.toLowerCase() === EDITOR_EMAIL;
+  const isEditor = EDITOR_EMAILS.includes(session?.user?.email?.toLowerCase());
 
   useEffect(() => {
     if (!supabase) return;
     const today = new Date().toISOString().slice(0, 10);
-    supabase.auth.getSession().then(({ data }) => { setSession(data.session); setShowCatalog(data.session?.user?.email?.toLowerCase() === EDITOR_EMAIL); });
+    supabase.auth.getSession().then(({ data }) => {
+      const sessionEmail = data.session?.user?.email?.toLowerCase();
+      setSession(data.session);
+      setShowCatalog(EDITOR_EMAILS.includes(sessionEmail));
+    });
     supabase.from('hymns').select('*').order('title').then(({ data }) => setHymns(data || []));
     supabase.from('service_program').select('*').eq('service_date', today).order('step_number').then(({ data }) => setSteps(data?.length ? data : (categories.find((item) => item.id === 'servicio')?.hymns || []).filter((item) => !getHiddenServiceSteps().includes(item.id)).map((item, index) => ({ ...item, description: getServiceStepOverrides()[item.id] || item.description || item.title, step_number: index + 1, localDefault: true }))));
   }, []);
 
   if (!supabase) return <main className="admin-page"><button className="back-button" onClick={onClose}>← Volver</button><h1>Panel administrativo</h1><p>Agrega las credenciales de Supabase en `.env.local` para activarlo.</p></main>;
-  const signIn = async (event) => { event.preventDefault(); const { data, error } = await supabase.auth.signInWithPassword(login); setSession(data.session); setShowCatalog(data.session?.user?.email?.toLowerCase() === EDITOR_EMAIL); setLoginMessage(error?.message || 'Sesión iniciada.'); };
+  const signIn = async (event) => {
+    event.preventDefault();
+    const { data, error } = await supabase.auth.signInWithPassword(login);
+    const sessionEmail = data.session?.user?.email?.toLowerCase();
+    setSession(data.session);
+    setShowCatalog(EDITOR_EMAILS.includes(sessionEmail));
+    setLoginMessage(error?.message || 'Sesión iniciada.');
+  };
   const resetEditor = () => { setEditingHymn(null); setHymn(emptyHymn); };
   const editHymn = (item) => { setEditingHymn(item); setHymn({ title: item.title, lyrics: item.lyrics || '', category: item.category || 'adoracion' }); setShowCatalog(true); };
   const saveHymn = async (event) => { event.preventDefault(); const title = hymn.title.trim(); const category = ['adoracion', 'avivamiento', 'ninos'].includes(hymn.category) ? hymn.category : 'adoracion'; if (hymns.some((item) => item.id !== editingHymn?.id && item.title.trim().toLocaleLowerCase('es') === title.toLocaleLowerCase('es'))) return setHymnMessage('Alabanza repetida. Usa otro nombre.'); let result; if (editingHymn) result = await supabase.from('hymns').update({ title, lyrics: hymn.lyrics, category }).eq('id', editingHymn.id).select().single(); else { const { data: last } = await supabase.from('hymns').select('number').order('number', { ascending: false }).limit(1).maybeSingle(); result = await supabase.from('hymns').insert({ title, lyrics: hymn.lyrics, category, number: (last?.number || 0) + 1 }).select().single(); } const { data, error } = result; setHymnMessage(error?.code === '23505' ? 'Alabanza repetida. Usa otro nombre.' : error?.message || (editingHymn ? 'Alabanza actualizada y movida de sección.' : 'Alabanza guardada correctamente.')); if (!error) { resetEditor(); setHymns((current) => (editingHymn ? current.map((item) => item.id === data.id ? data : item) : [...current, data]).sort((a, b) => a.title.localeCompare(b.title, 'es'))); } };
