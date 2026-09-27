@@ -5,10 +5,10 @@ import { supabase } from './supabase.js';
 const EDITOR_EMAILS = ['aylint1307@gmail.com', 'irisc02@gmail.com'].map((email) => email.toLowerCase());
 const HYMN_TAGS = {
   none: { label: 'Sin etiqueta', color: '#d8d1c8', meaning: 'Sin clasificación especial' },
-  duelo: { label: 'Duelo', color: '#1a1a1a', meaning: 'Estas alabanzas son para duelo' },
-  cumpleanos: { label: 'Cumpleaños', color: '#f4c95d', meaning: 'Estas alabanzas son para cumpleaños' },
-  boda: { label: 'Boda', color: '#d97bb4', meaning: 'Estas alabanzas son para boda' },
-  dedicacion: { label: 'Dedicación', color: '#4d8bf4', meaning: 'Estas alabanzas son para dedicación' }
+  duelo: { label: 'Duelo', color: '#1a1a1a', meaning: 'alabanzas con esta etiqueta pueden cantarse en duelo' },
+  cumpleanos: { label: 'Cumpleaños', color: '#f4c95d', meaning: 'alabanzas con esta etiqueta pueden cantarse en Cumpleaños' },
+  boda: { label: 'Boda', color: '#d97bb4', meaning: 'alabanzas con esta etiqueta pueden cantarse en boda ' },
+  dedicacion: { label: 'Dedicación', color: '#4d8bf4', meaning: 'alabanzas con esta etiqueta pueden cantarse en dedicacion' }
 };
 const emptyHymn = { title: '', lyrics: '', category: 'adoracion', tag: 'none' };
 const HIDDEN_SERVICE_STEPS_KEY = 'himnario-hidden-service-steps';
