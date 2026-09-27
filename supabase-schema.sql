@@ -16,6 +16,8 @@ create table if not exists public.service_program (
   created_at timestamptz not null default now()
 );
 
+alter table public.hymns add column if not exists tag text not null default 'none';
+
 alter table public.hymns enable row level security;
 alter table public.service_program enable row level security;
 
