@@ -4,6 +4,7 @@ create table if not exists public.hymns (
   title text not null,
   lyrics text not null default '',
   category text not null check (category in ('adoracion', 'avivamiento', 'ninos')),
+  tag text not null default 'none' check (tag in ('none', 'duelo', 'cumpleanos', 'boda', 'dedicacion')),
   created_at timestamptz not null default now()
 );
 
@@ -21,6 +22,9 @@ alter table public.service_program enable row level security;
 alter table public.hymns drop constraint if exists hymns_category_check;
 alter table public.hymns add constraint hymns_category_check check (category in ('adoracion', 'avivamiento', 'ninos'));
 
+alter table public.hymns drop constraint if exists hymns_tag_check;
+alter table public.hymns add constraint hymns_tag_check check (tag in ('none', 'duelo', 'cumpleanos', 'boda', 'dedicacion'));
+
 do $$
 begin
   if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'hymns' and policyname = 'Public can read hymns') then
@@ -32,11 +36,11 @@ begin
   drop policy if exists "Authenticated users manage hymns" on public.hymns;
   drop policy if exists "Administrators manage hymns" on public.hymns;
   drop policy if exists "Editor updates hymns" on public.hymns;
-  create policy "Administrators manage hymns" on public.hymns for all to authenticated using ((auth.jwt() ->> 'email') <> 'aylint1307@gmail.com') with check ((auth.jwt() ->> 'email') <> 'aylint1307@gmail.com');
-  create policy "Editor updates hymns" on public.hymns for update to authenticated using ((auth.jwt() ->> 'email') = 'aylint1307@gmail.com') with check ((auth.jwt() ->> 'email') = 'aylint1307@gmail.com');
+  create policy "Administrators manage hymns" on public.hymns for all to authenticated using ((auth.jwt() ->> 'email') not in ('aylint1307@gmail.com', 'irisc02@gmail.com')) with check ((auth.jwt() ->> 'email') not in ('aylint1307@gmail.com', 'irisc02@gmail.com'));
+  create policy "Editor updates hymns" on public.hymns for update to authenticated using ((auth.jwt() ->> 'email') in ('aylint1307@gmail.com', 'irisc02@gmail.com')) with check ((auth.jwt() ->> 'email') in ('aylint1307@gmail.com', 'irisc02@gmail.com'));
   drop policy if exists "Authenticated users manage service program" on public.service_program;
   drop policy if exists "Administrators manage service program" on public.service_program;
-  create policy "Administrators manage service program" on public.service_program for all to authenticated using ((auth.jwt() ->> 'email') <> 'aylint1307@gmail.com') with check ((auth.jwt() ->> 'email') <> 'aylint1307@gmail.com');
+  create policy "Administrators manage service program" on public.service_program for all to authenticated using ((auth.jwt() ->> 'email') not in ('aylint1307@gmail.com', 'irisc02@gmail.com')) with check ((auth.jwt() ->> 'email') not in ('aylint1307@gmail.com', 'irisc02@gmail.com'));
 end $$;
 
 create index if not exists hymns_category_number_idx on public.hymns(category, number);
