@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { allHymns, categories } from './hymns.js';
 import { supabase } from './supabase.js';
 
-const EDITOR_EMAILS = ['aylint1307@gmail.com', 'irisc02@gmail.com'].map((email) => email.toLowerCase());
+const EDITOR_EMAILS = ['tiul81brisa@gmail.com', 'irisc02@gmail.com'].map((email) => email.toLowerCase());
 const HYMN_TAGS = {
   none: { label: 'Sin etiqueta', color: '#d8d1c8', meaning: 'Sin clasificación especial' },
   duelo: { label: 'Duelo', color: '#1a1a1a', meaning: 'alabanzas con esta etiqueta pueden cantarse en duelo' },
